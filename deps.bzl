@@ -794,14 +794,14 @@ def prysm_deps():
     # Note: The keep directives help gazelle leave this alone.
     go_repository(
         name = "com_github_ethereum_go_ethereum",
-        commit = "e8523651bf6f6abd5bde56b087954463ee13e4ca",  # keep
+        commit = "3ee875b6ec92c1177fed7ed3d710083c2d800f33",  # keep
         importpath = "github.com/ethereum/go-ethereum",  # keep
         # Note: go-ethereum is not bazel-friendly with regards to cgo. We have a
         # a fork that has resolved these issues by disabling HID/USB support and
         # some manual fixes for c imports in the crypto package. This is forked
         # branch should be updated from time to time with the latest go-ethereum
         # code.
-        remote = "https://github.com/prysmaticlabs/bazel-go-ethereum",  # keep
+        remote = "https://github.com/canarynetwork/bazel-go-ethereum",  # keep
         replace = None,  # keep
         sum = None,  # keep
         vcs = "git",  # keep
