@@ -16,7 +16,7 @@ require (
 	github.com/dgraph-io/ristretto v0.0.4-0.20210318174700-74754f61e018
 	github.com/dustin/go-humanize v1.0.0
 	github.com/emicklei/dot v0.11.0
-	github.com/ethereum/go-ethereum v1.10.10
+	github.com/ethereum/go-ethereum v1.10.13-aura
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/ferranbt/fastssz v0.0.0-20210905181407-59cf6761a7d5
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5
@@ -122,6 +122,8 @@ require (
 	k8s.io/klog/v2 v2.3.0 // indirect
 	k8s.io/utils v0.0.0-20200520001619-278ece378a50 // indirect
 )
+
+replace github.com/ethereum/go-ethereum => github.com/openethereum/go-ethereum v1.10.13-aura
 
 replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.20190722034630-4f2e55fcf87b
 
