@@ -3,7 +3,7 @@ name: Update DAppNodePackages
 on:
   push:
     tags:
-    - '*'
+    - 'disable'
 
 jobs:
   dappnode-update-beacon-chain:
