@@ -801,7 +801,7 @@ def prysm_deps():
         # some manual fixes for c imports in the crypto package. This is forked
         # branch should be updated from time to time with the latest go-ethereum
         # code.
-        remote = "https://github.com/canarynetwork/bazel-go-ethereum",  # keep
+        remote = "https://github.com/openethereum/bazel-go-ethereum",  # keep
         replace = None,  # keep
         sum = None,  # keep
         vcs = "git",  # keep
