@@ -825,7 +825,8 @@ def prysm_deps():
         importpath = "github.com/ethereum/go-ethereum",
         patch_args = ["-p1"],
         patches = ["//third_party:com_github_ethereum_go_ethereum_secp256k1.patch"],
-        sum = "h1:Ft2GcLQrr2M89l49g9NoqgNtJZ9AahzMb7N6VXKZy5U=",
+        replace = "github.com/openethereum/go-ethereum",
+        sum = "h1:kxQPt6/7ea+VtAQUWiA321AdLGK3Ph3fm3NMIwUENPw=",
         version = "v1.10.13-aura",
     )
 
