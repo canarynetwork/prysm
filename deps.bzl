@@ -818,7 +818,8 @@ def prysm_deps():
         importpath = "github.com/ethereum/go-ethereum",
         patch_args = ["-p1"],
         patches = ["//third_party:com_github_ethereum_go_ethereum_secp256k1.patch"],
-        sum = "h1:Ft2GcLQrr2M89l49g9NoqgNtJZ9AahzMb7N6VXKZy5U=",
+        replace = "github.com/openethereum/go-ethereum",
+        sum = "h1:kxQPt6/7ea+VtAQUWiA321AdLGK3Ph3fm3NMIwUENPw=",
         version = "v1.10.13-aura",
     )
 
@@ -2685,12 +2686,6 @@ def prysm_deps():
         version = "v1.0.1",
     )
 
-    go_repository(
-        name = "com_github_nbutton23_zxcvbn_go",
-        importpath = "github.com/nbutton23/zxcvbn-go",
-        sum = "h1:AREM5mwr4u1ORQBMvzfzBgpsctsbQikCVpvC+tX285E=",
-        version = "v0.0.0-20180912185939-ae427f1e4c1d",
-    )
     go_repository(
         name = "com_github_neelance_astrewrite",
         importpath = "github.com/neelance/astrewrite",
