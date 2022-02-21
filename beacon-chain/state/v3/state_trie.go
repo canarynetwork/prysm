@@ -318,7 +318,7 @@ func (b *BeaconState) rootSelector(field types.FieldIndex) ([32]byte, error) {
 			err := b.resetFieldTrie(
 				field,
 				b.state.Eth1DataVotes,
-				fieldparams.Eth1DataVotesLength,
+				params.BeaconConfig().Eth1DataVotesLength(),
 			)
 			if err != nil {
 				return [32]byte{}, err

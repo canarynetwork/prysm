@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	gethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/prysmaticlabs/prysm/beacon-chain/powchain/types"
 	"github.com/prysmaticlabs/prysm/testing/assert"
 	"github.com/prysmaticlabs/prysm/testing/require"
@@ -44,7 +43,7 @@ func TestHeightKeyFn_InvalidObj(t *testing.T) {
 func TestBlockCache_byHash(t *testing.T) {
 	cache := newHeaderCache()
 
-	header := &gethTypes.Header{
+	header := &types.Header{
 		ParentHash: common.HexToHash("0x12345"),
 		Number:     big.NewInt(55),
 	}
@@ -67,7 +66,7 @@ func TestBlockCache_byHash(t *testing.T) {
 func TestBlockCache_byHeight(t *testing.T) {
 	cache := newHeaderCache()
 
-	header := &gethTypes.Header{
+	header := &types.Header{
 		ParentHash: common.HexToHash("0x12345"),
 		Number:     big.NewInt(55),
 	}
@@ -92,7 +91,7 @@ func TestBlockCache_maxSize(t *testing.T) {
 	cache := newHeaderCache()
 
 	for i := int64(0); i < int64(maxCacheSize+10); i++ {
-		header := &gethTypes.Header{
+		header := &types.Header{
 			Number: big.NewInt(i),
 		}
 		err := cache.AddHeader(header)

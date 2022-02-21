@@ -1,17 +1,17 @@
 package types
 
 import (
+	"encoding/json"
 	"math/big"
 	"reflect"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	gethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 func Test_headerToHeaderInfo(t *testing.T) {
 	type args struct {
-		hdr *gethTypes.Header
+		hdr *Header
 	}
 	tests := []struct {
 		name    string
@@ -21,7 +21,7 @@ func Test_headerToHeaderInfo(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			args: args{hdr: &gethTypes.Header{
+			args: args{hdr: &Header{
 				Number: big.NewInt(500),
 				Time:   2345,
 			}},
@@ -33,7 +33,7 @@ func Test_headerToHeaderInfo(t *testing.T) {
 		},
 		{
 			name: "nil number",
-			args: args{hdr: &gethTypes.Header{
+			args: args{hdr: &Header{
 				Time: 2345,
 			}},
 			wantErr: true,
@@ -50,5 +50,34 @@ func Test_headerToHeaderInfo(t *testing.T) {
 				t.Errorf("headerToHeaderInfo() got = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func Test_headerJsonDecoding(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		blockJSON string
+		hash      common.Hash
+	}{
+		{
+			name:      "Mainnet block",
+			blockJSON: `{"baseFeePerGas":"0x9b029df50","difficulty":"0x2dd441ee5e654b","extraData":"0x466c6578706f6f6c2f53312f484b202d2053c3a36f205061756c6f","gasLimit":"0x1cb3486","gasUsed":"0x30c0c8","hash":"0xb41ae2673ac6e564d8d097ce8204ea4fc6b60bc536f9aeb8ca614b0a8643bd85","logsBloom":"0x000010200000001202080020200110000040c0000800000001040000c400000010000000088020002000108004001100220000110a01a08001000000002400000044000000800008098000084414004000200045080410003100000080111008020000000a200000000084030010080e0000800040422000d00040100448080800000000008001000408080000420000040000014100000000000008001181a41289306202802010000800a040000000880041004402011001000808000080840000130282020002202300000010000010003009002024c90004010208046010003020090000000100000200000008c008000011000001400088080040006101","miner":"0x7f101fe45e6649a6fb8f3f8b43ed03d353f2b90c","mixHash":"0x7d2b0ed31f461de545815f4f8349bd8ac69782859ba678bdcce61fc5c2b5841a","nonce":"0x1e80bb0a7239e363","number":"0xd7efb8","parentHash":"0x9d678b52c55979bf2ca2a8c5d1f09ccb174a34112cc6daff55559411f3271eb6","receiptsRoot":"0x46f22f73d192de3a2050c10f751f926ace5c803b05894ff4b77d71abde532711","sha3Uncles":"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347","size":"0x2001","stateRoot":"0xc503b2cb20da50dc5c7eb0fd7235001501c40214997b139f9698a5ae69b13519","timestamp":"0x61ff9100","totalDifficulty":"0x8a315c52baac72b1870","transactionsRoot":"0x11a57b1ab6f867d074d17812c5203eae650d12589bc91882162f107c0a8adb9d","uncles":[]}`,
+			hash:      common.HexToHash("0xb41ae2673ac6e564d8d097ce8204ea4fc6b60bc536f9aeb8ca614b0a8643bd85"),
+		},
+		{
+			name:      "Gnosis Chain block",
+			blockJSON: `{"author":"0x657e832b1a67cdef9e117afd2f419387259fa93e","difficulty":"0xfffffffffffffffffffffffffffffffe","extraData":"0x4e65746865726d696e64","gasLimit":"0x1c9c380","gasUsed":"0x45a37","hash":"0x7c92d02b59d7785edc7b581c71f929905bac25aedb7af9fdb538ba010922f2ed","logsBloom":"0x00000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000080000000000008000000000000000000000000000000000000000000200000800000000000000000000800000000000010000000000010000000200000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","miner":"0x657e832b1a67cdef9e117afd2f419387259fa93e","number":"0x138bf62","parentHash":"0xa30c413ce9eb6dccf31dfd0ee2f87533b19cb112a2e1008ad9c90b0a0dbda974","receiptsRoot":"0xf218da366ed411ce1e8e11648bb3869c00f1d5b15dc481304cdcfaa11b729cea","sha3Uncles":"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347","signature":"0x135a1bba6ffd9450ba19aa68d0d02777db64d7d66d1e76a00690d4978103760671f2e3fee9b4b4274aaa77483845f4437bc500b9c455a45efcae422efe90ecbe00","size":"0x458","stateRoot":"0xc7595f12f866cf607872ae41302e0c9d3e4d0b912be01b73d5c90ce793f04ab2","step":328827780,"totalDifficulty":"0x138bf61ffffffffffffffffffffffffeb2fbd1a","timestamp":"0x61ff9194","baseFeePerGas":"0x7","transactionsRoot":"0x15031ee0b9dc0fe9488e0db1366583b96acec241e73ca07a0213dee25f122054","uncles":[]}`,
+			hash:      common.HexToHash("0x7c92d02b59d7785edc7b581c71f929905bac25aedb7af9fdb538ba010922f2ed"),
+		},
+	} {
+		t.Logf("testing %s\n", test.name)
+		header := new(Header)
+		err := json.Unmarshal([]byte(test.blockJSON), header)
+		if err != nil {
+			t.Errorf("can't decode block")
+		}
+		if header.Hash() != test.hash {
+			t.Errorf("incorrect hash")
+		}
 	}
 }

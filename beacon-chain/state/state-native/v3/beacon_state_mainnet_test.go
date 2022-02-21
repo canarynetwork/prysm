@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	fieldparams "github.com/prysmaticlabs/prysm/config/fieldparams"
+	"github.com/prysmaticlabs/prysm/config/params"
 	"github.com/prysmaticlabs/prysm/testing/assert"
 	"github.com/prysmaticlabs/prysm/testing/require"
 )
@@ -43,7 +44,7 @@ func TestMainnetSszValuesAgainstFieldParams(t *testing.T) {
 	f, ok = bsType.FieldByName("eth1DataVotes")
 	require.Equal(t, true, ok, "Required field not found")
 	v = f.Tag.Get("ssz-max")
-	assert.Equal(t, strconv.Itoa(fieldparams.Eth1DataVotesLength), v)
+	assert.Equal(t, strconv.Itoa(params.BeaconConfig().Eth1DataVotesLength()), v)
 
 	f, ok = bsType.FieldByName("validators")
 	require.Equal(t, true, ok, "Required field not found")
