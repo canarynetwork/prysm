@@ -70,7 +70,7 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 }
 
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
-	testAcc, err := contracts.Setup()
+	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 
 	beaconDB := dbutil.SetupDB(t)
@@ -123,7 +123,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoRpcClient(t *testing.T) {
 }
 
 func TestBlockExists_ValidHash(t *testing.T) {
-	testAcc, err := contracts.Setup()
+	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 
 	beaconDB := dbutil.SetupDB(t)

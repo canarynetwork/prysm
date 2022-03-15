@@ -151,9 +151,30 @@ type headerMarshaling struct {
 	GasUsed    hexutil.Uint64
 	Time       hexutil.Uint64
 	Extra      hexutil.Bytes
-	Signature  hexutil.Bytes
+	Step       *OptQuoteBigInt
+	Signature  OptPrefixHexBytes
 	BaseFee    *hexutil.Big
 	Hash       common.Hash `json:"hash"` // adds call to Hash() in MarshalJSON
+}
+
+type OptPrefixHexBytes hexutil.Bytes
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (b *OptPrefixHexBytes) UnmarshalJSON(input []byte) error {
+	if len(input) >= 4 && input[0] == '"' && input[len(input)-1] == '"' && (input[2] != 'x' && input[2] != 'X') {
+		return (*hexutil.Bytes)(b).UnmarshalJSON(append([]byte("\"0x"), input[1:]...))
+	}
+	return (*hexutil.Bytes)(b).UnmarshalJSON(input)
+}
+
+type OptQuoteBigInt big.Int
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (i *OptQuoteBigInt) UnmarshalJSON(input []byte) error {
+	if len(input) >= 2 && input[0] == '"' && input[len(input)-1] == '"' {
+		return (*big.Int)(i).UnmarshalJSON(input[1 : len(input)-1])
+	}
+	return (*big.Int)(i).UnmarshalJSON(input)
 }
 
 // Hash returns the block hash of the header, which is simply the keccak256 hash of its
