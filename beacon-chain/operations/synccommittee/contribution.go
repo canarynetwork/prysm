@@ -7,11 +7,12 @@ import (
 	types "github.com/prysmaticlabs/eth2-types"
 	"github.com/prysmaticlabs/prysm/container/queue"
 	ethpb "github.com/prysmaticlabs/prysm/proto/prysm/v1alpha1"
+	log "github.com/sirupsen/logrus"
 )
 
 // To give two slots tolerance for objects that arrive earlier.
 // This account for previous slot, current slot, two future slots.
-const syncCommitteeMaxQueueSize = 4
+const syncCommitteeMaxQueueSize = 8
 
 // SaveSyncCommitteeContribution saves a sync committee contribution in to a priority queue.
 // The priority queue is capped at syncCommitteeMaxQueueSize contributions.
@@ -39,6 +40,11 @@ func (s *Store) SaveSyncCommitteeContribution(cont *ethpb.SyncCommitteeContribut
 
 		contributions = append(contributions, copied)
 		savedSyncCommitteeContributionTotal.Inc()
+		log.WithFields(log.Fields{
+			"slot":  cont.Slot,
+			"index": cont.SubcommitteeIndex,
+			"count": len(contributions),
+		}).Warn("Added sync committee contribution to pool")
 		return s.contributionCache.Push(&queue.Item{
 			Key:      syncCommitteeKey(cont.Slot),
 			Value:    contributions,
@@ -47,6 +53,11 @@ func (s *Store) SaveSyncCommitteeContribution(cont *ethpb.SyncCommitteeContribut
 	}
 
 	// Contribution does not exist. Insert new.
+	log.WithFields(log.Fields{
+		"slot":  cont.Slot,
+		"index": cont.SubcommitteeIndex,
+		"count": 1,
+	}).Warn("Added new sync committee contribution to pool")
 	if err := s.contributionCache.Push(&queue.Item{
 		Key:      syncCommitteeKey(cont.Slot),
 		Value:    []*ethpb.SyncCommitteeContribution{copied},
@@ -58,9 +69,11 @@ func (s *Store) SaveSyncCommitteeContribution(cont *ethpb.SyncCommitteeContribut
 
 	// Trim contributions in queue down to syncCommitteeMaxQueueSize.
 	if s.contributionCache.Len() > syncCommitteeMaxQueueSize {
-		if _, err := s.contributionCache.Pop(); err != nil {
-			return err
-		}
+		item, err = s.contributionCache.Pop()
+		log.WithFields(log.Fields{
+			"slot": item.Priority,
+		}).Warn("Popped sync committee contributions")
+		return err
 	}
 
 	return nil
@@ -73,11 +86,18 @@ func (s *Store) SyncCommitteeContributions(slot types.Slot) ([]*ethpb.SyncCommit
 	defer s.contributionLock.RUnlock()
 
 	item := s.contributionCache.RetrieveByKey(syncCommitteeKey(slot))
+	log.WithFields(log.Fields{
+		"slot": slot,
+	}).Warn("Empty sync committee contributions")
 	if item == nil {
 		return []*ethpb.SyncCommitteeContribution{}, nil
 	}
 
 	contributions, ok := item.Value.([]*ethpb.SyncCommitteeContribution)
+	log.WithFields(log.Fields{
+		"slot":  slot,
+		"count": len(contributions),
+	}).Warn("Retrieved sync committee contributions")
 	if !ok {
 		return nil, errors.New("not typed []ethpb.SyncCommitteeContribution")
 	}

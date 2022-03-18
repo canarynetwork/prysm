@@ -11,7 +11,6 @@ package queue
 import (
 	"container/heap"
 	"errors"
-	"sync"
 )
 
 // ErrEmpty is returned for queues with no items
@@ -40,6 +39,7 @@ func New() *PriorityQueue {
 // keys as the index. This enables users to find specific items by key. The map
 // must be kept in sync with the data slice.
 // See https://golang.org/pkg/container/heap/#example__priorityQueue
+// Not safe for concurrent access, concurrent access must be managed by external RWMutex.
 type PriorityQueue struct {
 	// data is the internal structure that holds the queue, and is operated on by
 	// heap functions
@@ -48,10 +48,6 @@ type PriorityQueue struct {
 	// dataMap represents all the items in the queue, with unique indexes, used
 	// for finding specific items. dataMap is kept in sync with the data slice
 	dataMap map[string]*Item
-
-	// lock is a read/write mutex, and used to facilitate read/write locks on the
-	// data and dataMap fields
-	lock sync.RWMutex
 }
 
 // queue is the internal data structure used to satisfy heap.Interface. This
@@ -77,8 +73,6 @@ type Item struct {
 
 // Len returns the count of items in the Priority Queue
 func (pq *PriorityQueue) Len() int {
-	pq.lock.RLock()
-	defer pq.lock.RUnlock()
 	return pq.data.Len()
 }
 
@@ -89,9 +83,6 @@ func (pq *PriorityQueue) Pop() (*Item, error) {
 	if pq.Len() == 0 {
 		return nil, ErrEmpty
 	}
-
-	pq.lock.Lock()
-	defer pq.lock.Unlock()
 
 	item, ok := heap.Pop(&pq.data).(*Item)
 	if !ok {
@@ -112,9 +103,6 @@ func (pq *PriorityQueue) Push(i *Item) error {
 		return errors.New("error adding item: Item Key is required")
 	}
 
-	pq.lock.Lock()
-	defer pq.lock.Unlock()
-
 	if _, ok := pq.dataMap[i.Key]; ok {
 		return ErrDuplicateItem
 	}
@@ -128,9 +116,6 @@ func (pq *PriorityQueue) Push(i *Item) error {
 // from the queue if found. Returns nil if not found. This method must fix the
 // queue after removing any key.
 func (pq *PriorityQueue) PopByKey(key string) (*Item, error) {
-	pq.lock.Lock()
-	defer pq.lock.Unlock()
-
 	item, ok := pq.dataMap[key]
 	if !ok {
 		return nil, nil
@@ -152,9 +137,6 @@ func (pq *PriorityQueue) PopByKey(key string) (*Item, error) {
 // RetrieveByKey searches the queue for an item with the given key and returns it
 // from the queue if found. Returns nil if not found.
 func (pq *PriorityQueue) RetrieveByKey(key string) *Item {
-	pq.lock.Lock()
-	defer pq.lock.Unlock()
-
 	item, ok := pq.dataMap[key]
 	if !ok {
 		return nil
