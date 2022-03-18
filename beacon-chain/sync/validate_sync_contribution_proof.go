@@ -18,6 +18,7 @@ import (
 	"github.com/prysmaticlabs/prysm/encoding/bytesutil"
 	"github.com/prysmaticlabs/prysm/monitoring/tracing"
 	ethpb "github.com/prysmaticlabs/prysm/proto/prysm/v1alpha1"
+	"github.com/sirupsen/logrus"
 	"go.opencensus.io/trace"
 )
 
@@ -57,6 +58,12 @@ func (s *Service) validateSyncContributionAndProof(ctx context.Context, pid peer
 		tracing.AnnotateError(span, err)
 		return pubsub.ValidationReject, err
 	}
+
+	log.WithFields(logrus.Fields{
+		"slot":  m.Message.Contribution.Slot,
+		"index": m.Message.Contribution.SubcommitteeIndex,
+		"bits":  m.Message.Contribution.AggregationBits.Count(),
+	}).Warn("Received p2p sync committee contribution")
 
 	// The contribution's slot is for the current slot (with a `MAXIMUM_GOSSIP_CLOCK_DISPARITY` allowance).
 	if err := altair.ValidateSyncMessageTime(m.Message.Contribution.Slot, s.cfg.chain.GenesisTime(), params.BeaconNetworkConfig().MaximumGossipClockDisparity); err != nil {

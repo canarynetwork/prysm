@@ -190,34 +190,16 @@ func ValidateSyncMessageTime(slot types.Slot, genesisTime time.Time, clockDispar
 	if err := slots.ValidateClock(slot, uint64(genesisTime.Unix())); err != nil {
 		return err
 	}
-	messageTime, err := slots.ToTime(uint64(genesisTime.Unix()), slot)
-	if err != nil {
-		return err
-	}
-	currentSlot := slots.Since(genesisTime)
-	slotStartTime, err := slots.ToTime(uint64(genesisTime.Unix()), currentSlot)
-	if err != nil {
-		return err
-	}
+	latestPermissibleSlot := slots.Since(genesisTime.Add(-clockDisparity))
+	earliestPermissibleSlot := slots.Since(genesisTime.Add(clockDisparity + 2*time.Second))
 
-	lowestSlotBound := slotStartTime.Add(-clockDisparity)
-	currentLowerBound := time.Now().Add(-clockDisparity)
-	// In the event the Slot's start time, is before the
-	// current allowable bound, we set the slot's start
-	// time as the bound.
-	if slotStartTime.Before(currentLowerBound) {
-		lowestSlotBound = slotStartTime
-	}
-
-	lowerBound := lowestSlotBound
-	upperBound := time.Now().Add(clockDisparity)
 	// Verify sync message slot is within the time range.
-	if messageTime.Before(lowerBound) || messageTime.After(upperBound) {
+	if slot < earliestPermissibleSlot || slot > latestPermissibleSlot {
 		return fmt.Errorf(
 			"sync message slot %d not within allowable range of %d to %d (current slot)",
 			slot,
-			uint64(lowerBound.Unix()-genesisTime.Unix())/params.BeaconConfig().SecondsPerSlot,
-			uint64(upperBound.Unix()-genesisTime.Unix())/params.BeaconConfig().SecondsPerSlot,
+			earliestPermissibleSlot,
+			latestPermissibleSlot,
 		)
 	}
 	return nil
