@@ -8,8 +8,8 @@ http_archive(
     sha256 = "8e0633dfb59f704594f19ae996a35650747adc621ada5e8b9fb588f808c89cb0",
     strip_prefix = "bazel-toolchains-3.7.0",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/3.7.0/bazel-toolchains-3.7.0.tar.gz",
-        "https://github.com/bazelbuild/bazel-toolchains/releases/download/3.7.0/bazel-toolchains-3.7.0.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/5.1.2/bazel-toolchains-5.1.2.tar.gz",
+        "https://github.com/bazelbuild/bazel-toolchains/releases/download/5.1.2/bazel-toolchains-5.1.2.tar.gz",
     ],
 )
 
