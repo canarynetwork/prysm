@@ -37,6 +37,8 @@ jobs:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
+      - name: Download python2 and libc6
+        run: sudo apt install -y python2 libc6-dev
       - name: Build beacon chain
         run: bazel run //cmd/beacon-chain:image_bundle --config release
       - name: Build validator
