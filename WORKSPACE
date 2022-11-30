@@ -159,9 +159,9 @@ container_pull(
 
 container_pull(
     name = "alpine_cc_linux_amd64",
-    digest = "sha256:ceeb6e8632fafc657116cbf3afbd522185a16963230b57881073dad22eb0e1a3",
+    digest = "sha256:752aa0c9a88461ffc50c5267bb7497ef03a303e38b2c8f7f2ded9bebe5f1f00e",
     registry = "index.docker.io",
-    repository = "frolvlad/alpine-glibc",
+    repository = "pinglamb/alpine-glibc",
 )
 
 container_pull(
