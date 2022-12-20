@@ -1,0 +1,51 @@
+name:   Release Suite
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  DOCKER_REGISTRY: ghcr.io
+  DOCKER_USERNAME: ${{ github.actor }}
+  DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  REPO_NAME: ${{ github.repository }}
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  extract-version:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Extract version
+        run: echo "::set-output name=VERSION::$(echo ${GITHUB_REF#refs/tags/})"
+        id: extract_version
+    outputs:
+      VERSION: ${{ steps.extract_version.outputs.VERSION }}
+
+  build-docker:
+    runs-on: ubuntu-18.04
+    needs: [extract-version]
+    # We need to enable experimental docker features in order to use `docker buildx`
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+      VERSION: ${{ needs.extract-version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      # - name: Download python2 and libc6
+      #   run: sudo apt install -y python2 libc6-dev
+      - name: Build beacon chain
+        run: bazel run //cmd/beacon-chain:image_bundle --config release
+      - name: Build validator
+        run: bazel run //cmd/validator:image_bundle --config release
+      - name: Docker tag and push
+        run: |
+          docker tag gcr.io/prysmaticlabs/prysm/beacon-chain:latest ${{ env.IMAGE_NAME }}-beacon-chain:${{ env.VERSION }}
+          docker tag gcr.io/prysmaticlabs/prysm/validator:latest ${{ env.IMAGE_NAME }}-validator:${{ env.VERSION }}
+          docker push ${{ env.IMAGE_NAME }}-beacon-chain:${{ env.VERSION }}
+          docker push ${{ env.IMAGE_NAME }}-validator:${{ env.VERSION }}
