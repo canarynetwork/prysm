@@ -14,8 +14,7 @@ string_flag(
 config_setting(
     name = "ssz_mainnet",
     flag_values = {
-        "@prysm//proto:network": "mainnet",
-        "@prysm//proto:network": "gnosis",
+        "@prysm//proto:network": ["mainnet", "gnosis"],
     },
 )
 
