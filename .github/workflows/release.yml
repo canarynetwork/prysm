@@ -40,9 +40,9 @@ jobs:
       # - name: Download python2 and libc6
       #   run: sudo apt install -y python2 libc6-dev
       - name: Build beacon chain
-        run: bazel run //cmd/beacon-chain:image_bundle --config release
+        run: bazel run //cmd/beacon-chain:image_bundle -//proto:network=gnosis --config release
       - name: Build validator
-        run: bazel run //cmd/validator:image_bundle --config release
+        run: bazel run //cmd/validator:image_bundle -//proto:network=gnosis --config release
       - name: Docker tag and push
         run: |
           docker tag gcr.io/prysmaticlabs/prysm/beacon-chain:latest ${{ env.IMAGE_NAME }}-beacon-chain:${{ env.VERSION }}
