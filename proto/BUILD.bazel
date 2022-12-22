@@ -24,3 +24,10 @@ config_setting(
         "@prysm//proto:network": "minimal",
     },
 )
+
+config_setting(
+    name = "ssz_gnosis",
+    flag_values = {
+        "@prysm//proto:network": "gnosis",
+    },
+)
