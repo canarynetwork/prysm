@@ -1,5 +1,3 @@
-//go:build gnosis
-
 package state_native
 
 import (
