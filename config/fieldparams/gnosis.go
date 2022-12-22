@@ -2,8 +2,7 @@
 
 package field_params
 
-
-adsf
+// adsf
 const (
 	Preset                                = "gnosis"
 	BlockRootsLength                      = 8192          // SLOTS_PER_HISTORICAL_ROOT

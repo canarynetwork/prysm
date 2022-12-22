@@ -17,7 +17,6 @@ go_test(
         "common_test.go",
         "mainnet_test.go",
         "minimal_test.go",
-        "gnosis_test.go",
     ],
     deps = [
         ":go_default_library",
